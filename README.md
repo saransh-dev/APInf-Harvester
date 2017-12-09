@@ -1,4 +1,4 @@
-# APInf-HArvester
+# APInf-Harvester
 
 ### NPM package used for schudeling job
 
