@@ -53,8 +53,8 @@ function deleteApi (id) {
 // Insert all APIs
 function insertApi (api) {
     const jsonData = {
-        'name': '00 00 000 0000 ' + api.name,
-        'description': 'no description',
+        'name': api.name,
+        'description': api.notes,
         'url': "https://liityntakatalogi.suomi.fi",
         'lifecycleStatus': 'development',
         'isPublic': false,
@@ -105,20 +105,20 @@ function getApis () {
 
         // initial a value for getting different api
         let diffApis = [];
-        oldApis.map((oldApi) => {
-            // find index of api from old apis on the basis of api's name
-            const index = body.result.results.findIndex(newApi => newApi.name === oldApi.name);
-            // if old api not exists in new api then store that api in diffApis array
-            if (index == -1) diffApis.push(oldApi);
-        });
-        if (diffApis.length > 0) {
-            diffApis.map( (api) => {
-                // delete all extra apis from old apis
-                deleteApi (api._id);
+        if (oldApis.length > 0) {
+            oldApis.map((oldApi) => {
+                // find index of api from old apis on the basis of api's name
+                const index = body.result.results.findIndex(newApi => newApi.name === oldApi.name);
+                // if old api not exists in new api then store that api in diffApis array
+                if (index == -1) diffApis.push(oldApi);
             });
+            if (diffApis.length > 0) {
+                diffApis.map( (api) => {
+                    // delete all extra apis from old apis
+                    deleteApi (api._id);
+                });
+            }
         }
-
-
     });
 }
 
