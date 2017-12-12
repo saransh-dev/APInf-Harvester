@@ -55,9 +55,18 @@ function deleteApi (id) {
 
 // Insert all APIs
 function insertApi (api) {
+    //use this to collect the URLs
+    var urlsForDescription = ''
+	
+    for(var i = 0; i < api.num_resources; i++){
+       urlsForDescription = urlsForDescription + api.resources[i].url + " / "
+    }	
+    
+    console.log(urlsForDescription)
+
     const jsonData = {
         'name': api.name,
-        'description': api.notes,
+        'description': api.notes + urlsForDescription,
         'url': "https://liityntakatalogi.suomi.fi",
         'lifecycleStatus': 'development',
         'isPublic': false,
@@ -92,8 +101,7 @@ function insertApi (api) {
                     // insert insert api data in old apis data
                     oldApis.push(body.data);
                 }
-            }
-            
+            }            
     });
 }
 
