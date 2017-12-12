@@ -2,17 +2,19 @@ const request = require('request');
 // import sender_config for userId, api Key and authentication key
 const sender_config = require('./authentications/sender_config.json');
 // For store old api data
-let oldApis = [];
+//let oldApis = [];
+oldApis = [];
 
 // Update api by id
 function updateApi (api, index) {
+    console.log('update api at index ' + index);
     request.put({
         headers:{
             'X-Api-Key':sender_config.apiKey,
             'X-Auth-Token': sender_config.authToken,
             'X-User-Id':sender_config.userId
         },
-        url: `${sender_config.url}${api._id}`,
+        url: `${sender_config.sinkUrl}${api._id}`,
         form: api
     }, function(err, resp, body){
         if (err){
@@ -29,13 +31,14 @@ function updateApi (api, index) {
 // Delete APIs
 function deleteApi (id) {
     console.log(':: id ',id)
+   console.log('****DELETE****' + id )	
     request.delete({
         headers:{
             'X-Api-Key':sender_config.apiKey,
             'X-Auth-Token': sender_config.authToken,
             'X-User-Id':sender_config.userId
         },
-        url: `${sender_config.url}${id}`,
+        url: `${sender_config.sinkUrl}${id}`,
     }, function(err, resp, body){
         
             if (err){
@@ -61,13 +64,14 @@ function insertApi (api) {
         'documentationUrl': api.resources[0].url,
         'externalDocumentation':api.url
     };
+    console.log('****INSERT***: ' + api.name + " " + api.notes + " " + api.url + "/n")
     request.post({
          headers:{
             'X-Api-Key':sender_config.apiKey,
             'X-Auth-Token': sender_config.authToken,
             'X-User-Id':sender_config.userId
         },
-        url: `${sender_config.url}`,
+        url: `${sender_config.sinkUrl}`,
         body: jsonData,
         json: true
     }, function(err, resp, body){
@@ -76,7 +80,8 @@ function insertApi (api) {
             } else {
                 // check condition api exists or not
                 if (body.message === 'Duplicate: API with same name already exists.') {
-                    // get api index from old apis data 
+                    // get api index from old apis data
+		   console.log('****DUPE API****') 
                     const index = oldApis.findIndex(api => api.name === jsonData.name);
                     // check update api exists in old api or not
                     if (index > -1) {
@@ -95,8 +100,10 @@ function insertApi (api) {
 
 // Get all APIs
 function getApis () {
+    console.log('getting apis at '+ Date.now());	
     //use request to perform the GET and POST operations
-    request('https://liityntakatalogi.suomi.fi/api/action/package_search', {json: true}, (err, res, body) => {
+    console.log(sender_config.sourceUrl)
+    request(sender_config.sourceUrl, {json: true}, (err, res, body) => {
         if(err) return console.log(err);
         body.result.results.map ((api) => {
             // insert all apis
@@ -104,7 +111,8 @@ function getApis () {
         });
 
         // initial a value for getting different api
-        let diffApis = [];
+        //let diffApis = [];
+	diffApis = [];
         if (oldApis.length > 0) {
             oldApis.map((oldApi) => {
                 // find index of api from old apis on the basis of api's name
@@ -124,10 +132,12 @@ function getApis () {
 
 
 function start () {
-    // console.log('start')
+    console.log('starting.. setting up cron job')
      
     var CronJob = require('cron').CronJob;
-    new CronJob('* * 10 * * *', function() {
+    //new CronJob('* * 10 * * *', function() {
+    //new CronJob('*/1 * * * *', function(){	
+    new CronJob(sender_config.cronJobDefinition, function(){	
     // get all apis;
       getApis ();
     }, null, true, 'America/Los_Angeles');

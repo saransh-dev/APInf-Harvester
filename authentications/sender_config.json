@@ -2,5 +2,7 @@
 	"apiKey":"VjeDge1BgReor00gYxAWlhdGtqCboA7zlJLmTWjZ",
   "authToken": "h3xdfo8q_yqQL7JQzXV6YXHHbqniHAkZbL6oi6SUNKH",
   "userId":"KFstxnDAGQkGCsqEt",
-  "url": "https://nightly.apinf.io:3002/apinf_catalog/apis/"
+  "sinkUrl": "https://nightly.apinf.io:3002/apinf_catalog/apis/",
+  "sourceUrl": "https://liityntakatalogi.qa.suomi.fi/api/action/package_search/",
+  "cronJobDefinition": "*/1 * * * *"
 }
