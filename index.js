@@ -5,7 +5,8 @@ const sender_config = require('./authentications/sender_config.json');
 let oldApis = [];
 
 // Update api by id
-function updateApi (api, index) {
+function updateApi (api, id, index) {
+    console.log(':: update api ',id)
     request.put({
         headers:{
             'X-Api-Key':sender_config.apiKey,
@@ -15,6 +16,7 @@ function updateApi (api, index) {
         url: `${sender_config.url}${api._id}`,
         form: api
     }, function(err, resp, body){
+        console.log(':: update status ',body.status)
         if (err){
             return console.log(err);
         } else  if (body && body.status == 'success' ){
@@ -28,7 +30,7 @@ function updateApi (api, index) {
 
 // Delete APIs
 function deleteApi (id) {
-    console.log(':: id ',id)
+    console.log(':: delete id ',id)
     request.delete({
         headers:{
             'X-Api-Key':sender_config.apiKey,
@@ -37,15 +39,15 @@ function deleteApi (id) {
         },
         url: `${sender_config.url}${id}`,
     }, function(err, resp, body){
-        
-            if (err){
-                return console.log(':: err ',err);
-            } else {
-                // get index of deleted api from old apis data
-                const index = oldApis.findIndex(api => api._id === id);
-                // reomved api data from old apis data
-                oldApis.splice(index, 1)
-            }
+        console.log(':: delete status ',body.status)
+        if (err){
+            return console.log(':: err ',err);
+        } else {
+            // get index of deleted api from old apis data
+            const index = oldApis.findIndex(api => api._id === id);
+            // reomved api data from old apis data
+            oldApis.splice(index, 1)
+        }
             
     });
 }
@@ -53,7 +55,7 @@ function deleteApi (id) {
 // Insert all APIs
 function insertApi (api) {
     const jsonData = {
-        'name': api.name,
+        'name': '0 ' + api.name,
         'description': api.notes,
         'url': "https://liityntakatalogi.suomi.fi",
         'lifecycleStatus': 'development',
@@ -71,24 +73,24 @@ function insertApi (api) {
         body: jsonData,
         json: true
     }, function(err, resp, body){
-            if (err){
-                return console.log(':: err ',err);
-            } else {
-                // check condition api exists or not
-                if (body.message === 'Duplicate: API with same name already exists.') {
-                    // get api index from old apis data 
-                    const index = oldApis.findIndex(api => api.name === jsonData.name);
-                    // check update api exists in old api or not
-                    if (index > -1) {
-                        // Request for update
-                        updateApi(jsonData, index);
-                    }
-                } else if (body.status === 'success') {
-                    // insert insert api data in old apis data
-                    oldApis.push(body.data);
+        if (err){
+            return console.log(':: err ',err);
+        } else {
+            console.log(':: insert status ',body.status)
+            // check condition api exists or not
+            if (body.message === 'Duplicate: API with same name already exists.') {
+                // get api index from old apis data 
+                const index = oldApis.findIndex(api => api.name === jsonData.name);
+                // check update api exists in old api or not
+                if (index > -1) {
+                    // Request for update
+                    updateApi(jsonData, oldApis[index]._id, index);
                 }
+            } else if (body.status === 'success') {
+                // insert insert api data in old apis data
+                oldApis.push(body.data);
             }
-            
+        }   
     });
 }
 
@@ -98,6 +100,7 @@ function getApis () {
     //use request to perform the GET and POST operations
     request('https://liityntakatalogi.suomi.fi/api/action/package_search', {json: true}, (err, res, body) => {
         if(err) return console.log(err);
+
         body.result.results.map ((api) => {
             // insert all apis
             insertApi (api);
@@ -127,7 +130,7 @@ function start () {
     // console.log('start')
      
     var CronJob = require('cron').CronJob;
-    new CronJob('* * 10 * * *', function() {
+    new CronJob('* * * * * *', function() {
     // get all apis;
       getApis ();
     }, null, true, 'America/Los_Angeles');
