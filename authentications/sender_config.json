@@ -4,5 +4,7 @@
   "userId":"KFstxnDAGQkGCsqEt",
   "sinkUrl": "https://nightly.apinf.io:3002/apinf_catalog/apis/",
   "sourceUrl": "https://liityntakatalogi.qa.suomi.fi/api/action/package_search/",
-  "cronJobDefinition": "*/1 * * * *"
+  "cronJobDefinition": "*/1 * * * *",
+  "path_newApisFile": "./logs/newApis.json",
+  "path_oldApisFile": "./logs/oldApis.json"
 }
