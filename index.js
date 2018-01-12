@@ -30,7 +30,7 @@ function insertAllApis (path, apis, callback) {
                 description = description + api.resources[i].url + " / "
             }
             const apiData = {
-                'name': '0 _ 0 ' + api.name,
+                'name': '0 ' + api.name,
                 'description': description,
                 'url': "https://liityntakatalogi.suomi.fi",
                 'lifecycleStatus': 'development',
@@ -144,8 +144,9 @@ function insertApiInOldApis (path, api, callback) {
                         const index = oldApisList.apis.findIndex((oldApi) => oldApi.name === api.name);
                         if (index == -1)
                             oldApisList.apis.push(api);
-                        else
+                        else{
                             oldApisList.apis[index] = api;
+                        }
 
                         
                         // ***** WRITE all oldApis in oldApis.json file
@@ -343,15 +344,17 @@ function getNewApis () {
 
 
                                 } else {
-
+                                    console.log('******* UPDATE CONDTIONS for', api.name,' ********** new Date ****** ',api.updated_at,' *****')
+                                    console.log('******* UPDATE CONDTIONS for', oldApis[index].name,' ********** old Date ****** ',oldApis[index].updated_at,' *****')
+                                    
                                     // ***** CHECK updated date of api changed or not
-                                    if(api.updated_at > oldApis[index].updated_at) {
+                                    if(new Date(api.updated_at).getTime() !== new Date(oldApis[index].updated_at).getTime()) {
+                                        
                                         console.log(':: 1 ****UPDATE***: ',api.name)
                         
                                         /***** UPDATE api in catalog ---- START *****/
                                             apiOperations.update(api, oldApis[index]._id, (err, body) => {
                                                 if (err) return console.log(':: err while insert ',err)
-
                                                 if (body && body.status == 'success' ){
 
                                                     /***** REPLACE old api data with updated data in oldApis.json File ---- START *****/

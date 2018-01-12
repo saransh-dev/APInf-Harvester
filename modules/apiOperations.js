@@ -32,8 +32,9 @@ module.exports  = {
             url: `${sender_config.sinkUrl}${id}`,
             form: api
         }, function(err, resp, body){
-            console.log(':: update status ',body.status || body)
-            callback(err, body);
+            const data = JSON.parse(body);
+            console.log(':: update status ',data.status ||  data)
+            callback(err, JSON.parse(body));
         });
     },
     delete: function (id, callback) {
