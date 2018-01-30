@@ -1,0 +1,22 @@
+ harvester has a configuration file that is located in /authentications/ folder. It contains following parameters
+ apiKey - value needed to post to catalog API
+ authToken - value needed to post to catalog API
+ userId - needs to match apiKey and authToken account.
+ 
+ those are available from APInf mangement kokeilu.apinf.io. Current values are from APInf fro test purposes.
+ 
+ sinkUrl - where the data is pushed
+ sourceUrl - where the data is fetched from
+ cronjobDefinition - is used to se the intervals the script executes operations. it follows standard cron notation
+ path_newApisFile - internal log file keeping API information
+ path_oldApisFile - internal log file keeping API information
+ 
+ prerequisite: node relatively new node version. package dependencies can be found in package.json, file is in project soure code root
+ how to: clone this project. credentials are ok for tests, simply execute: "node index.js"
+ 
+ incase script crash / network timeout / unexpected, simpy kill existing process while is is not processing and restart. 
+ If complete meltdown happens, do the following: 1) remove all the apis inserted by this script from kokeilu.apinf.io 
+ 2) reclone the source and 
+ 3) start from scratch: node index.js
+ 
+ emergency contact: ilari mikkonen from APInf
